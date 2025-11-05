@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,19 @@ import InvoiceTable from '@/components/InvoiceTable';
 import BottomNav from '@/components/BottomNav';
 import { storage } from '@/utils/storage';
 import { formatCurrency, exportToCSV, getAgingCategory } from '@/utils/formatters';
+import { updateInvoiceStatuses } from '@/utils/invoiceHelpers';
 
 export default function InvoicesList() {
   const [, setLocation] = useLocation();
-  const [invoices] = useState(storage.getInvoices());
+  const [invoices, setInvoices] = useState(storage.getInvoices());
   const [customers] = useState(storage.getCustomers());
   const [filter, setFilter] = useState<'all' | 'Paid' | 'Pending' | 'Overdue'>('all');
+
+  useEffect(() => {
+    const updatedInvoices = updateInvoiceStatuses(storage.getInvoices());
+    storage.setInvoices(updatedInvoices);
+    setInvoices(updatedInvoices);
+  }, []);
 
   const filteredInvoices = filter === 'all' 
     ? invoices 
@@ -112,6 +119,10 @@ export default function InvoicesList() {
             invoices={filteredInvoices}
             customers={customers}
             onViewInvoice={(invoice) => console.log('View invoice:', invoice)}
+            onInvoiceUpdated={() => {
+              const updatedInvoices = storage.getInvoices();
+              setInvoices(updatedInvoices);
+            }}
           />
         </div>
       </main>

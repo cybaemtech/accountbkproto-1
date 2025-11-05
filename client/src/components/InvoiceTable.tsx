@@ -1,20 +1,39 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Eye } from 'lucide-react';
+import { Eye, Check } from 'lucide-react';
 import { Invoice, Customer } from '@/utils/storage';
 import { formatCurrency, formatDate } from '@/utils/formatters';
+import { storage } from '@/utils/storage';
+import { useToast } from '@/hooks/use-toast';
 import StatusBadge from './StatusBadge';
 
 interface InvoiceTableProps {
   invoices: Invoice[];
   customers: Customer[];
   onViewInvoice?: (invoice: Invoice) => void;
+  onInvoiceUpdated?: () => void;
 }
 
-export default function InvoiceTable({ invoices, customers, onViewInvoice }: InvoiceTableProps) {
+export default function InvoiceTable({ invoices, customers, onViewInvoice, onInvoiceUpdated }: InvoiceTableProps) {
+  const { toast } = useToast();
+
   const getCustomerName = (customerId: number) => {
     const customer = customers.find(c => c.id === customerId);
     return customer?.name || 'Unknown';
+  };
+
+  const markAsPaid = (invoiceId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const allInvoices = storage.getInvoices();
+    const updatedInvoices = allInvoices.map(inv =>
+      inv.id === invoiceId ? { ...inv, status: 'Paid' as const } : inv
+    );
+    storage.setInvoices(updatedInvoices);
+    onInvoiceUpdated?.();
+    toast({
+      title: 'Invoice updated',
+      description: 'Invoice marked as paid',
+    });
   };
 
   return (
@@ -38,7 +57,7 @@ export default function InvoiceTable({ invoices, customers, onViewInvoice }: Inv
               <th className="px-4 py-3 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Due Date
               </th>
-              <th className="px-4 py-3 text-right text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              <th className="px-4 py-3 text-center text-xs font-semibold text-muted-foreground uppercase tracking-wide">
                 Actions
               </th>
             </tr>
@@ -73,15 +92,28 @@ export default function InvoiceTable({ invoices, customers, onViewInvoice }: Inv
                     {formatDate(invoice.dueDate)}
                   </span>
                 </td>
-                <td className="px-4 py-3 text-right">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onViewInvoice?.(invoice)}
-                    data-testid={`button-view-invoice-${invoice.id}`}
-                  >
-                    <Eye className="w-4 h-4" />
-                  </Button>
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-center gap-2">
+                    {invoice.status !== 'Paid' && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={(e) => markAsPaid(invoice.id, e)}
+                        data-testid={`button-mark-paid-${invoice.id}`}
+                        title="Mark as Paid"
+                      >
+                        <Check className="w-4 h-4 text-green-500" />
+                      </Button>
+                    )}
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onViewInvoice?.(invoice)}
+                      data-testid={`button-view-invoice-${invoice.id}`}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </td>
               </tr>
             ))}

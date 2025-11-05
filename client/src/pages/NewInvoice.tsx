@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,12 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import { storage, InvoiceItem } from '@/utils/storage';
 import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatters';
+import AddCustomerDialog from '@/components/AddCustomerDialog';
 
 export default function NewInvoice() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [customers] = useState(storage.getCustomers());
+  const [customers, setCustomers] = useState(storage.getCustomers());
   const [invoices] = useState(storage.getInvoices());
+  const [showAddCustomer, setShowAddCustomer] = useState(false);
   
   const [customerId, setCustomerId] = useState<number | null>(null);
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -51,22 +53,38 @@ export default function NewInvoice() {
       return;
     }
 
-    const invoiceNumber = `INV-${String(invoices.length + 1).padStart(3, '0')}`;
+    if (items.some(item => !item.name || item.qty <= 0 || item.price <= 0)) {
+      toast({
+        title: 'Error',
+        description: 'Please fill in all item details correctly',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const allInvoices = storage.getInvoices();
+    const invoiceNumber = `INV-${String(allInvoices.length + 1).padStart(3, '0')}`;
+    
+    const finalDueDate = dueDate || date;
+    const today = new Date().toISOString().split('T')[0];
+    const isOverdue = finalDueDate < today;
+    
+    const invoiceStatus: 'Overdue' | 'Pending' = isOverdue ? 'Overdue' : 'Pending';
     
     const newInvoice = {
-      id: invoices.length + 1,
+      id: allInvoices.length + 1,
       invoiceNumber,
       customerId,
       date,
-      dueDate: dueDate || date,
+      dueDate: finalDueDate,
       items,
       subtotal,
       tax: totalTax,
       total: grandTotal,
-      status: 'Pending' as const,
+      status: invoiceStatus,
     };
 
-    storage.setInvoices([...invoices, newInvoice]);
+    storage.setInvoices([...allInvoices, newInvoice]);
 
     toast({
       title: 'Invoice created',
@@ -74,6 +92,10 @@ export default function NewInvoice() {
     });
 
     setLocation('/invoices');
+  };
+
+  const handleCustomerAdded = () => {
+    setCustomers(storage.getCustomers());
   };
 
   return (
@@ -98,21 +120,31 @@ export default function NewInvoice() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <Label htmlFor="customer">Customer</Label>
-              <Select 
-                value={customerId?.toString() || ''} 
-                onValueChange={(value) => setCustomerId(Number(value))}
-              >
-                <SelectTrigger id="customer" data-testid="select-customer" className="mt-1">
-                  <SelectValue placeholder="Select customer" />
-                </SelectTrigger>
-                <SelectContent>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id.toString()}>
-                      {customer.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex gap-2 mt-1">
+                <Select 
+                  value={customerId?.toString() || ''} 
+                  onValueChange={(value) => setCustomerId(Number(value))}
+                >
+                  <SelectTrigger id="customer" data-testid="select-customer" className="flex-1">
+                    <SelectValue placeholder="Select customer" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {customers.map(customer => (
+                      <SelectItem key={customer.id} value={customer.id.toString()}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowAddCustomer(true)}
+                  data-testid="button-add-customer-quick"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
             
             <div>
@@ -264,6 +296,12 @@ export default function NewInvoice() {
           </div>
         </Card>
       </main>
+
+      <AddCustomerDialog
+        open={showAddCustomer}
+        onOpenChange={setShowAddCustomer}
+        onCustomerAdded={handleCustomerAdded}
+      />
     </div>
   );
 }

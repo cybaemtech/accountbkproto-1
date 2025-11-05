@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +8,19 @@ import InventoryAlert from '@/components/InventoryAlert';
 import BottomNav from '@/components/BottomNav';
 import { storage } from '@/utils/storage';
 import { formatCurrency } from '@/utils/formatters';
+import { updateInvoiceStatuses } from '@/utils/invoiceHelpers';
 
 export default function BillingHub() {
   const [, setLocation] = useLocation();
-  const [invoices] = useState(storage.getInvoices());
+  const [invoices, setInvoices] = useState(storage.getInvoices());
   const [customers] = useState(storage.getCustomers());
   const [inventory] = useState(storage.getInventory());
+
+  useEffect(() => {
+    const updatedInvoices = updateInvoiceStatuses(storage.getInvoices());
+    storage.setInvoices(updatedInvoices);
+    setInvoices(updatedInvoices);
+  }, []);
 
   const totalBilled = invoices.reduce((sum, inv) => sum + inv.total, 0);
   const totalDue = invoices.filter(inv => inv.status !== 'Paid').reduce((sum, inv) => sum + inv.total, 0);
@@ -70,6 +77,10 @@ export default function BillingHub() {
             invoices={invoices.slice(0, 5)}
             customers={customers}
             onViewInvoice={(invoice) => console.log('View invoice:', invoice)}
+            onInvoiceUpdated={() => {
+              const updatedInvoices = storage.getInvoices();
+              setInvoices(updatedInvoices);
+            }}
           />
         </div>
 
