@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { storage, initializeSeedData } from '@/utils/storage';
 import { Building2 } from 'lucide-react';
 
 export default function Auth() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [mode, setMode] = useState<'login' | 'signup' | 'select-company'>('login');
   const [email, setEmail] = useState('');
@@ -65,7 +65,7 @@ export default function Auth() {
       description: 'Please set up your company',
     });
     
-    setLocation('/company-setup');
+    navigate('/setup');
   };
 
   const handleSelectCompany = (companyId: number) => {
@@ -74,7 +74,7 @@ export default function Auth() {
     
     if (company) {
       storage.setCurrentCompany(company);
-      setLocation('/dashboard');
+      navigate('/dashboard');
     }
   };
 
@@ -113,7 +113,7 @@ export default function Auth() {
           <Button
             variant="ghost"
             className="w-full mt-4"
-            onClick={() => setLocation('/company-setup')}
+            onClick={() => navigate('/setup')}
             data-testid="button-add-new-company"
           >
             + Add New Company

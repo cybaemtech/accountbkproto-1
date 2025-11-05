@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { storage } from '@/utils/storage';
 
 interface ProtectedRouteProps {
@@ -8,20 +8,20 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, requireCompany = true }: ProtectedRouteProps) {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const currentUser = storage.getCurrentUser();
   const currentCompany = storage.getCurrentCompany();
 
   useEffect(() => {
     if (!currentUser) {
-      setLocation('/');
+      navigate('/');
       return;
     }
 
     if (requireCompany && !currentCompany) {
-      setLocation('/');
+      navigate('/setup');
     }
-  }, [currentUser, currentCompany, requireCompany, setLocation]);
+  }, [currentUser, currentCompany, requireCompany, navigate]);
 
   if (!currentUser || (requireCompany && !currentCompany)) {
     return null;

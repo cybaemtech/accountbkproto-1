@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { storage } from '@/utils/storage';
 import { ArrowLeft } from 'lucide-react';
 
 export default function CompanySetup() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   
   const [formData, setFormData] = useState({
@@ -76,7 +76,7 @@ export default function CompanySetup() {
       description: 'Your company has been set up successfully',
     });
 
-    setLocation('/dashboard');
+    navigate('/dashboard');
   };
 
   return (
@@ -84,7 +84,7 @@ export default function CompanySetup() {
       <div className="max-w-3xl mx-auto p-4 md:p-8">
         <Button
           variant="ghost"
-          onClick={() => setLocation('/')}
+          onClick={() => navigate('/')}
           className="mb-4"
           data-testid="button-back"
         >
