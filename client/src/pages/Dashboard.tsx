@@ -21,33 +21,39 @@ export default function Dashboard() {
       .filter(inv => inv.status === 'Paid')
       .reduce((sum, inv) => sum + inv.total, 0);
     
-    const totalExpenses = storage.getDashboard().kpis.expenses;
+    const totalExpenses = 0;
     const profit = totalSales - totalExpenses;
 
     return { sales: totalSales, expenses: totalExpenses, profit };
   }, [invoices]);
 
   const trends = useMemo(() => {
-    const monthlyData: { [key: string]: { sales: number; expenses: number } } = {};
+    const monthlyData: { [key: string]: { sales: number; count: number } } = {};
     
     invoices.forEach(inv => {
+      if (inv.status !== 'Paid') return;
+      
       const date = new Date(inv.date);
       const monthKey = date.toLocaleDateString('en-US', { month: 'short' });
       
       if (!monthlyData[monthKey]) {
-        monthlyData[monthKey] = { sales: 0, expenses: 0 };
+        monthlyData[monthKey] = { sales: 0, count: 0 };
       }
       
-      if (inv.status === 'Paid') {
-        monthlyData[monthKey].sales += inv.total;
-      }
+      monthlyData[monthKey].sales += inv.total;
+      monthlyData[monthKey].count += 1;
     });
 
-    const months = ['Jul', 'Aug', 'Sep', 'Oct', 'Nov'];
-    return months.map(month => ({
+    const now = new Date();
+    const last5Months = Array.from({ length: 5 }, (_, i) => {
+      const d = new Date(now.getFullYear(), now.getMonth() - (4 - i), 1);
+      return d.toLocaleDateString('en-US', { month: 'short' });
+    });
+
+    return last5Months.map(month => ({
       month,
       sales: monthlyData[month]?.sales || 0,
-      expenses: Math.floor(Math.random() * 25000) + 15000,
+      expenses: 0,
     }));
   }, [invoices]);
 

@@ -16,9 +16,10 @@ export default function InvoicesList() {
   const [filter, setFilter] = useState<'all' | 'Paid' | 'Pending' | 'Overdue'>('all');
 
   useEffect(() => {
-    const updatedInvoices = updateInvoiceStatuses(storage.getInvoices());
+    const allInvoices = storage.getAllInvoices();
+    const updatedInvoices = updateInvoiceStatuses(allInvoices);
     storage.setInvoices(updatedInvoices);
-    setInvoices(updatedInvoices);
+    setInvoices(storage.getInvoices());
   }, []);
 
   const filteredInvoices = filter === 'all' 

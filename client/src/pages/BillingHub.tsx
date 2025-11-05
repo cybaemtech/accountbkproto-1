@@ -17,9 +17,10 @@ export default function BillingHub() {
   const [inventory] = useState(storage.getInventory());
 
   useEffect(() => {
-    const updatedInvoices = updateInvoiceStatuses(storage.getInvoices());
+    const allInvoices = storage.getAllInvoices();
+    const updatedInvoices = updateInvoiceStatuses(allInvoices);
     storage.setInvoices(updatedInvoices);
-    setInvoices(updatedInvoices);
+    setInvoices(storage.getInvoices());
   }, []);
 
   const totalBilled = invoices.reduce((sum, inv) => sum + inv.total, 0);

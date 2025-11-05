@@ -1,14 +1,18 @@
 import { Invoice } from './storage';
 
 export function updateInvoiceStatuses(invoices: Invoice[]): Invoice[] {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   
   return invoices.map(invoice => {
     if (invoice.status === 'Paid') {
       return invoice;
     }
     
-    const isOverdue = invoice.dueDate < today;
+    const dueDate = new Date(invoice.dueDate);
+    dueDate.setHours(0, 0, 0, 0);
+    
+    const isOverdue = dueDate < today;
     return {
       ...invoice,
       status: isOverdue ? 'Overdue' : 'Pending' as 'Overdue' | 'Pending',

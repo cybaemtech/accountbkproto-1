@@ -32,13 +32,24 @@ export default function AddCustomerDialog({ open, onOpenChange, onCustomerAdded 
       return;
     }
 
-    const customers = storage.getCustomers();
+    const currentCompany = storage.getCurrentCompany();
+    if (!currentCompany) {
+      toast({
+        title: 'Error',
+        description: 'No company selected',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const allCustomers = storage.getAllCustomers();
     const newCustomer = {
-      id: customers.length + 1,
+      id: allCustomers.length + 1,
+      companyId: currentCompany.id,
       ...formData,
     };
 
-    storage.setCustomers([...customers, newCustomer]);
+    storage.setCustomers([...allCustomers, newCustomer]);
 
     toast({
       title: 'Customer added',

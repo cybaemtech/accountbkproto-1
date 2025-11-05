@@ -24,7 +24,7 @@ export default function InvoiceTable({ invoices, customers, onViewInvoice, onInv
 
   const markAsPaid = (invoiceId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    const allInvoices = storage.getInvoices();
+    const allInvoices = storage.getAllInvoices();
     const updatedInvoices = allInvoices.map(inv =>
       inv.id === invoiceId ? { ...inv, status: 'Paid' as const } : inv
     );

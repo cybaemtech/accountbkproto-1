@@ -24,6 +24,7 @@ export interface Company {
 
 export interface Customer {
   id: number;
+  companyId: number;
   name: string;
   email: string;
   phone: string;
@@ -38,6 +39,7 @@ export interface InvoiceItem {
 
 export interface Invoice {
   id: number;
+  companyId: number;
   invoiceNumber: string;
   customerId: number;
   date: string;
@@ -51,6 +53,7 @@ export interface Invoice {
 
 export interface InventoryItem {
   id: number;
+  companyId: number;
   name: string;
   qty: number;
   threshold: number;
@@ -102,14 +105,32 @@ export const storage = {
   getCompanies: (): Company[] => getFromStorage(STORAGE_KEYS.COMPANIES, []),
   setCompanies: (companies: Company[]): void => setToStorage(STORAGE_KEYS.COMPANIES, companies),
   
-  getCustomers: (): Customer[] => getFromStorage(STORAGE_KEYS.CUSTOMERS, []),
+  getCustomers: (): Customer[] => {
+    const currentCompany = storage.getCurrentCompany();
+    if (!currentCompany) return [];
+    const all = getFromStorage<Customer[]>(STORAGE_KEYS.CUSTOMERS, []);
+    return all.filter(c => c.companyId === currentCompany.id);
+  },
   setCustomers: (customers: Customer[]): void => setToStorage(STORAGE_KEYS.CUSTOMERS, customers),
+  getAllCustomers: (): Customer[] => getFromStorage(STORAGE_KEYS.CUSTOMERS, []),
   
-  getInvoices: (): Invoice[] => getFromStorage(STORAGE_KEYS.INVOICES, []),
+  getInvoices: (): Invoice[] => {
+    const currentCompany = storage.getCurrentCompany();
+    if (!currentCompany) return [];
+    const all = getFromStorage<Invoice[]>(STORAGE_KEYS.INVOICES, []);
+    return all.filter(i => i.companyId === currentCompany.id);
+  },
   setInvoices: (invoices: Invoice[]): void => setToStorage(STORAGE_KEYS.INVOICES, invoices),
+  getAllInvoices: (): Invoice[] => getFromStorage(STORAGE_KEYS.INVOICES, []),
   
-  getInventory: (): InventoryItem[] => getFromStorage(STORAGE_KEYS.INVENTORY, []),
+  getInventory: (): InventoryItem[] => {
+    const currentCompany = storage.getCurrentCompany();
+    if (!currentCompany) return [];
+    const all = getFromStorage<InventoryItem[]>(STORAGE_KEYS.INVENTORY, []);
+    return all.filter(i => i.companyId === currentCompany.id);
+  },
   setInventory: (inventory: InventoryItem[]): void => setToStorage(STORAGE_KEYS.INVENTORY, inventory),
+  getAllInventory: (): InventoryItem[] => getFromStorage(STORAGE_KEYS.INVENTORY, []),
   
   getDashboard: (): DashboardData => getFromStorage(STORAGE_KEYS.DASHBOARD, {
     kpis: { sales: 0, expenses: 0, profit: 0 },
@@ -152,18 +173,19 @@ export function initializeSeedData() {
     ]);
   }
 
-  if (storage.getCustomers().length === 0) {
+  if (storage.getAllCustomers().length === 0) {
     storage.setCustomers([
-      { id: 1, name: 'Tommy Anderson', email: 'tommy@example.com', phone: '9876543210' },
-      { id: 2, name: 'Sarah Wilson', email: 'sarah@example.com', phone: '9876543211' },
-      { id: 3, name: 'Mike Johnson', email: 'mike@example.com', phone: '9876543212' },
+      { id: 1, companyId: 1, name: 'Tommy Anderson', email: 'tommy@example.com', phone: '9876543210' },
+      { id: 2, companyId: 1, name: 'Sarah Wilson', email: 'sarah@example.com', phone: '9876543211' },
+      { id: 3, companyId: 1, name: 'Mike Johnson', email: 'mike@example.com', phone: '9876543212' },
     ]);
   }
 
-  if (storage.getInvoices().length === 0) {
+  if (storage.getAllInvoices().length === 0) {
     storage.setInvoices([
       {
         id: 1,
+        companyId: 1,
         invoiceNumber: 'INV-001',
         customerId: 1,
         date: '2025-10-15',
@@ -176,6 +198,7 @@ export function initializeSeedData() {
       },
       {
         id: 2,
+        companyId: 1,
         invoiceNumber: 'INV-002',
         customerId: 2,
         date: '2025-10-20',
@@ -188,6 +211,7 @@ export function initializeSeedData() {
       },
       {
         id: 3,
+        companyId: 1,
         invoiceNumber: 'INV-003',
         customerId: 3,
         date: '2025-09-10',
@@ -201,11 +225,11 @@ export function initializeSeedData() {
     ]);
   }
 
-  if (storage.getInventory().length === 0) {
+  if (storage.getAllInventory().length === 0) {
     storage.setInventory([
-      { id: 1, name: 'Product A', qty: 8, threshold: 10, price: 1200 },
-      { id: 2, name: 'Product B', qty: 3, threshold: 5, price: 2500 },
-      { id: 3, name: 'Product C', qty: 25, threshold: 10, price: 850 },
+      { id: 1, companyId: 1, name: 'Product A', qty: 8, threshold: 10, price: 1200 },
+      { id: 2, companyId: 1, name: 'Product B', qty: 3, threshold: 5, price: 2500 },
+      { id: 3, companyId: 1, name: 'Product C', qty: 25, threshold: 10, price: 850 },
     ]);
   }
 

@@ -62,17 +62,33 @@ export default function NewInvoice() {
       return;
     }
 
-    const allInvoices = storage.getInvoices();
-    const invoiceNumber = `INV-${String(allInvoices.length + 1).padStart(3, '0')}`;
+    const currentCompany = storage.getCurrentCompany();
+    if (!currentCompany) {
+      toast({
+        title: 'Error',
+        description: 'No company selected',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const allInvoices = storage.getAllInvoices();
+    const companyInvoices = allInvoices.filter(i => i.companyId === currentCompany.id);
+    const invoiceNumber = `INV-${String(companyInvoices.length + 1).padStart(3, '0')}`;
     
     const finalDueDate = dueDate || date;
-    const today = new Date().toISOString().split('T')[0];
-    const isOverdue = finalDueDate < today;
     
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const dueDateObj = new Date(finalDueDate);
+    dueDateObj.setHours(0, 0, 0, 0);
+    
+    const isOverdue = dueDateObj < today;
     const invoiceStatus: 'Overdue' | 'Pending' = isOverdue ? 'Overdue' : 'Pending';
     
     const newInvoice = {
       id: allInvoices.length + 1,
+      companyId: currentCompany.id,
       invoiceNumber,
       customerId,
       date,
