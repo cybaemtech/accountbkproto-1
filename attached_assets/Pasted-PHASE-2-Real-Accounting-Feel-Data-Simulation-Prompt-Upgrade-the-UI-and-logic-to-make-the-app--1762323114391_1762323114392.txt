@@ -1,0 +1,103 @@
+PHASE 2 — Real Accounting Feel + Data Simulation
+
+Prompt:
+
+Upgrade the UI and logic to make the app feel like a real accounting dashboard similar to Vyapaar or Tally.
+
+✅ Dashboard Page:
+
+Show cards for Total Sales, Total Expenses, Profit/Loss, Pending Invoices.
+
+Add a Bar chart for monthly sales vs expenses using mock data from JSON (localStorage).
+
+Include a Recent Transactions table.
+
+✅ Invoices Page:
+
+Show a full table with Invoice ID, Customer, Date, Total, Status, Due Date.
+
+Filter by Paid / Pending / Overdue using buttons.
+
+"Download CSV" button using JavaScript Blob export.
+
+✅ New Invoice Page:
+
+Invoice form with dropdown for customer, input for date, auto-generated invoice number.
+
+Add item rows dynamically (Item name, Qty, Rate, Tax, Total).
+
+Subtotal, Tax, and Grand Total auto-calculated.
+
+“Save & Send” button stores invoice JSON into localStorage.
+
+✅ Inventory Page:
+
+Table of all stock items with columns: Item Name, Quantity, Price, Value.
+
+Low stock alert highlighting rows below threshold.
+
+Add/Edit/Delete functionality saved in localStorage.
+
+✅ Customers Page:
+
+Manage customer list with name, email, phone.
+
+Add/Edit/Delete customers stored in localStorage.
+
+✅ Billing Hub:
+
+Combined summary of total invoices, receivables, payables.
+
+Show quick invoice creation shortcut.
+
+🎨 PHASE 3 — UI Polish & Professional Design
+
+Prompt:
+
+Refine the UI to look modern, premium, and accounting-grade with Tailwind styling.
+
+✅ Overall Theme:
+
+Background: #0E1626
+
+Cards: slightly lighter tone #141E33
+
+Accent: teal #14B8A6
+
+Text: use text-gray-100 and text-gray-400 for labels.
+
+✅ Components to Improve:
+
+Add beautiful charts (recharts or chart.js) with smooth animations.
+
+Replace all raw buttons with Tailwind-styled buttons:
+
+Primary (bg-teal-500 hover:bg-teal-600)
+
+Secondary (border border-gray-700)
+
+Add icons from Lucide-react to sidebar and quick action buttons.
+
+Add smooth transitions between pages (Framer Motion page transitions).
+
+Add toast notifications for “Data Saved”, “Invoice Created”, etc.
+
+Add small hover effects and shadow on cards.
+
+✅ Dashboard Polish:
+
+Animate KPI numbers counting up.
+
+Highlight positive/negative trends with green/red text.
+
+✅ Sidebar Polish:
+
+Show selected item highlight bar (teal left border).
+
+Collapsible mode with tooltips on hover.
+
+✅ Extra:
+
+Include a small “Company Switcher” dropdown in the sidebar header.
+
+Add “Profile” & “Logout” buttons in top-right.
