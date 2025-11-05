@@ -1,31 +1,25 @@
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import BottomNav from '@/components/BottomNav';
 import { storage } from '@/utils/storage';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Building2, User, LogOut } from 'lucide-react';
 
 export default function Settings() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const company = storage.getCurrentCompany();
   const user = storage.getCurrentUser();
 
   const handleLogout = () => {
     storage.setCurrentUser(null);
     storage.setCurrentCompany(null);
-    setLocation('/');
+    navigate('/');
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="bg-card border-b border-card-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <h1 className="text-xl font-bold text-foreground">Settings</h1>
-        </div>
-      </header>
+    <div className="p-4 md:p-6 space-y-6">
+      <h1 className="text-2xl font-bold text-foreground mb-6">Settings</h1>
 
-      <main className="max-w-3xl mx-auto p-4 md:p-6 space-y-6">
-        <Card className="p-6">
+      <Card className="p-6">
           <div className="flex items-start gap-4">
             <div className="p-3 bg-primary/10 rounded-lg">
               <User className="w-6 h-6 text-primary" />
@@ -58,7 +52,7 @@ export default function Settings() {
             <Button
               variant="outline"
               className="w-full justify-start"
-              onClick={() => setLocation('/company-setup')}
+              onClick={() => navigate('/company-setup')}
               data-testid="button-add-company"
             >
               <Building2 className="w-4 h-4 mr-2" />
@@ -75,9 +69,6 @@ export default function Settings() {
             </Button>
           </div>
         </Card>
-      </main>
-
-      <BottomNav />
     </div>
   );
 }

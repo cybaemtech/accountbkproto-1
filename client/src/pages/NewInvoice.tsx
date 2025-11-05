@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { formatCurrency } from '@/utils/formatters';
 import AddCustomerDialog from '@/components/AddCustomerDialog';
 
 export default function NewInvoice() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [customers, setCustomers] = useState(storage.getCustomers());
   const [invoices] = useState(storage.getInvoices());
@@ -107,7 +107,7 @@ export default function NewInvoice() {
       description: `Invoice ${invoiceNumber} has been created successfully`,
     });
 
-    setLocation('/invoices');
+    navigate('/invoices');
   };
 
   const handleCustomerAdded = () => {
@@ -115,24 +115,21 @@ export default function NewInvoice() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="bg-card border-b border-card-border sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => setLocation('/invoices')}
-            data-testid="button-back"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back
-          </Button>
-          <h1 className="text-xl font-bold text-foreground">New Invoice</h1>
-          <div className="w-20" />
-        </div>
-      </header>
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex items-center justify-between mb-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate('/invoices')}
+          data-testid="button-back"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back
+        </Button>
+        <h1 className="text-xl font-bold text-foreground">New Invoice</h1>
+        <div className="w-20" />
+      </div>
 
-      <main className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-        <Card className="p-6">
+      <Card className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <Label htmlFor="customer">Customer</Label>
@@ -311,7 +308,7 @@ export default function NewInvoice() {
             </Button>
           </div>
         </Card>
-      </main>
+      
 
       <AddCustomerDialog
         open={showAddCustomer}

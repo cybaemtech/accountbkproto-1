@@ -1,16 +1,15 @@
 import { useState, useMemo } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { DollarSign, TrendingUp, Wallet } from 'lucide-react';
 import KPICard from '@/components/KPICard';
 import QuickActions from '@/components/QuickActions';
 import SalesChart from '@/components/SalesChart';
 import InventoryAlert from '@/components/InventoryAlert';
-import BottomNav from '@/components/BottomNav';
 import AddCustomerDialog from '@/components/AddCustomerDialog';
 import { storage } from '@/utils/storage';
 
 export default function Dashboard() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [inventory] = useState(storage.getInventory());
   const [showAddCustomer, setShowAddCustomer] = useState(false);
   const company = storage.getCurrentCompany();
@@ -58,56 +57,48 @@ export default function Dashboard() {
   }, [invoices]);
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="bg-card border-b border-card-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
-            <p className="text-sm text-muted-foreground">{company?.name || 'Welcome'}</p>
-          </div>
-        </div>
-      </header>
+    <div className="p-4 md:p-6 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">{company?.name || 'Welcome'}</p>
+      </div>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <KPICard
-            label="Total Sales"
-            value={kpis.sales}
-            icon={DollarSign}
-            trend={{ value: 12.5, isPositive: true }}
-          />
-          <KPICard
-            label="Total Expenses"
-            value={kpis.expenses}
-            icon={Wallet}
-            trend={{ value: 3.2, isPositive: false }}
-          />
-          <KPICard
-            label="Profit/Loss"
-            value={kpis.profit}
-            icon={TrendingUp}
-            trend={{ value: 8.1, isPositive: kpis.profit > 0 }}
-          />
-        </div>
-
-        <QuickActions
-          onCreateInvoice={() => setLocation('/new-invoice')}
-          onAddCustomer={() => setShowAddCustomer(true)}
-          onRecordExpense={() => console.log('Record Expense')}
-          onAddStock={() => console.log('Add Stock')}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <KPICard
+          label="Total Sales"
+          value={kpis.sales}
+          icon={DollarSign}
+          trend={{ value: 12.5, isPositive: true }}
         />
-
-        <AddCustomerDialog
-          open={showAddCustomer}
-          onOpenChange={setShowAddCustomer}
+        <KPICard
+          label="Total Expenses"
+          value={kpis.expenses}
+          icon={Wallet}
+          trend={{ value: 3.2, isPositive: false }}
         />
+        <KPICard
+          label="Profit/Loss"
+          value={kpis.profit}
+          icon={TrendingUp}
+          trend={{ value: 8.1, isPositive: kpis.profit > 0 }}
+        />
+      </div>
 
-        <SalesChart data={trends} />
+      <QuickActions
+        onCreateInvoice={() => navigate('/new-invoice')}
+        onAddCustomer={() => setShowAddCustomer(true)}
+        onRecordExpense={() => console.log('Record Expense')}
+        onAddStock={() => console.log('Add Stock')}
+      />
 
-        <InventoryAlert items={inventory} />
-      </main>
+      <AddCustomerDialog
+        open={showAddCustomer}
+        onOpenChange={setShowAddCustomer}
+      />
 
-      <BottomNav />
+      <SalesChart data={trends} />
+
+      <InventoryAlert items={inventory} />
     </div>
   );
 }

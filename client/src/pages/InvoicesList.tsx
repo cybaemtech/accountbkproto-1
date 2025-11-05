@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, Plus } from 'lucide-react';
 import InvoiceTable from '@/components/InvoiceTable';
-import BottomNav from '@/components/BottomNav';
 import { storage } from '@/utils/storage';
 import { formatCurrency, exportToCSV, getAgingCategory } from '@/utils/formatters';
 import { updateInvoiceStatuses } from '@/utils/invoiceHelpers';
 
 export default function InvoicesList() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState(storage.getInvoices());
   const [customers] = useState(storage.getCustomers());
   const [filter, setFilter] = useState<'all' | 'Paid' | 'Pending' | 'Overdue'>('all');
@@ -57,31 +56,27 @@ export default function InvoicesList() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="bg-card border-b border-card-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Invoices</h1>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleExportCSV}
-              data-testid="button-download-csv"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Export CSV
-            </Button>
-            <Button
-              onClick={() => setLocation('/new-invoice')}
-              data-testid="button-new-invoice"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Invoice
-            </Button>
-          </div>
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Invoices</h1>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={handleExportCSV}
+            data-testid="button-download-csv"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Export CSV
+          </Button>
+          <Button
+            onClick={() => navigate('/new-invoice')}
+            data-testid="button-new-invoice"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            New Invoice
+          </Button>
         </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      </div>
         <div className="flex flex-wrap gap-2">
           {filters.map(f => (
             <Button
@@ -126,9 +121,9 @@ export default function InvoicesList() {
             }}
           />
         </div>
-      </main>
+      
 
-      <BottomNav />
+      
     </div>
   );
 }

@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FileText, Clock, CheckCircle2, Plus } from 'lucide-react';
 import InvoiceTable from '@/components/InvoiceTable';
 import InventoryAlert from '@/components/InventoryAlert';
-import BottomNav from '@/components/BottomNav';
 import { storage } from '@/utils/storage';
 import { formatCurrency } from '@/utils/formatters';
 import { updateInvoiceStatuses } from '@/utils/invoiceHelpers';
 
 export default function BillingHub() {
-  const [, setLocation] = useLocation();
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState(storage.getInvoices());
   const [customers] = useState(storage.getCustomers());
   const [inventory] = useState(storage.getInventory());
@@ -34,22 +33,19 @@ export default function BillingHub() {
   ];
 
   return (
-    <div className="min-h-screen bg-background pb-20 md:pb-0">
-      <header className="bg-card border-b border-card-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-foreground">Billing Hub</h1>
-          <Button
-            onClick={() => setLocation('/new-invoice')}
-            data-testid="button-quick-invoice"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Quick Invoice
-          </Button>
-        </div>
-      </header>
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-foreground">Billing Hub</h1>
+        <Button
+          onClick={() => navigate('/new-invoice')}
+          data-testid="button-quick-invoice"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Quick Invoice
+        </Button>
+      </div>
 
-      <main className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {stats.map(stat => {
             const Icon = stat.icon;
             return (
@@ -70,10 +66,10 @@ export default function BillingHub() {
               </Card>
             );
           })}
-        </div>
+      </div>
 
-        <div>
-          <h2 className="text-lg font-semibold text-foreground mb-4">Recent Invoices</h2>
+      <div>
+        <h2 className="text-lg font-semibold text-foreground mb-4">Recent Invoices</h2>
           <InvoiceTable
             invoices={invoices.slice(0, 5)}
             customers={customers}
@@ -83,12 +79,9 @@ export default function BillingHub() {
               setInvoices(updatedInvoices);
             }}
           />
-        </div>
+      </div>
 
-        <InventoryAlert items={inventory} />
-      </main>
-
-      <BottomNav />
+      <InventoryAlert items={inventory} />
     </div>
   );
 }
